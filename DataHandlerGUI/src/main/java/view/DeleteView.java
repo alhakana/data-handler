@@ -52,9 +52,9 @@ public class DeleteView extends GridPane {
 		add(new Label("Properties"), 0, 1);
 		add(tfProperties, 1, 1);
 		
-		add(new Label("Format for properties: property_name=property_value,property_name=property_value..."), 0, 5, 2, 1);
+		add(new Label("Format for properties: property_name=property_value,property_name=property_value..."), 0, 2, 4, 1);
 		
-		add(btnDelete, 4, 6);
+		add(btnDelete, 4, 3);
 	}
 
 	private void setOnAction() {
@@ -74,8 +74,7 @@ public class DeleteView extends GridPane {
 				tblEntities.setItems(FXCollections.observableArrayList(dataHandlerSpecification.getFileService().read()));
 				tblEntities.refresh();
 			}
-			else
-				new Alert(AlertType.ERROR, "Unsuccessfully deleted entities.").show();
+			else new Alert(AlertType.ERROR, "Unsuccessfully deleted entities.").show();
 		});
 	}
 }

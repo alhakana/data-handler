@@ -73,7 +73,9 @@ public class Entity implements Comparable<Entity> {
 	}
 
 	public String getName() {
-		return propertyMap.get("name").toString();
+		if (propertyMap.containsKey("name"))
+			return propertyMap.get("name").toString();
+		return "";
 	}
 
 	public String getProperties() {
@@ -95,8 +97,9 @@ public class Entity implements Comparable<Entity> {
 		for(Map.Entry<String, Object> property : propertyMap.entrySet()) {
 			if (property.getValue() instanceof Entity) {
 				stringBuilder.append(property.getKey()).append("\n");
-				stringBuilder.append("id = ").append(((Entity) property.getValue()).getId());
-				stringBuilder.append("name = ").append(((Entity) property.getValue()).getName());
+				stringBuilder.append("id = ").append(((Entity) property.getValue()).getId()).append("\n");
+				if (((Entity) property.getValue()).getPropertyMap().containsKey("name"))
+					stringBuilder.append("name = ").append(((Entity) property.getValue()).getName()).append("\n");
 				stringBuilder.append(((Entity) property.getValue()).getProperties());
 			}
 		}

@@ -5,8 +5,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import model.Entity;
 import service.DataHandlerJsonImplementation;
-import spec.FileServiceSpecification;
-
+import service.FileServiceSpecification;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,6 +18,7 @@ import java.util.Map;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class FileRepository extends FileServiceSpecification {
 
+    @Override
     public List<Entity> read() {
         List<Entity> entities = new ArrayList<>();
 
@@ -30,6 +30,7 @@ public class FileRepository extends FileServiceSpecification {
         return entities;
     }
 
+    @Override
     public List<Entity> importData(String file) {
         List<Entity> entities = new ArrayList<>();
 
@@ -103,17 +104,25 @@ public class FileRepository extends FileServiceSpecification {
 
     private void prepareFileForWriting(String path) throws IOException {
         File file = new File(path);
-        FileReader fileReader = new FileReader(file);
-        char[] charContent = new char[(int) file.length()];
-        fileReader.read(charContent);
-        String content = new String(charContent);
+        StringBuilder stringBuilder = new StringBuilder();
 
-        StringBuilder stringBuilder = new StringBuilder().append(content);
-        if (file.length() != 0) stringBuilder.deleteCharAt(stringBuilder.length() - 1).append(",");
+        if (file.length() != 0) {
+            FileReader fileReader = new FileReader(file);
+            char[] charContent = new char[(int) file.length()];
+            fileReader.read(charContent);
+            String content = new String(charContent);
+            content = content.substring(0, content.indexOf("]"));
+            content = content.replace("]", "");
+            stringBuilder.append(content);
+            stringBuilder.append(",");
+
+            fileReader.close();
+        }
         else stringBuilder.append("[");
 
         FileWriter fileWriter = new FileWriter(path);
         fileWriter.write(stringBuilder.toString());
+        fileWriter.close();
     }
 
     public void clearFiles() {
@@ -140,10 +149,12 @@ public class FileRepository extends FileServiceSpecification {
         }
     }
 
+    @Override
     public void write(List<Entity> entities) {
         entities.iterator().forEachRemaining(this::write);
     }
 
+    @Override
     public void write(Entity entity) {
         List<Entity> entities = new ArrayList<>();
         String path = null;
@@ -163,7 +174,8 @@ public class FileRepository extends FileServiceSpecification {
     }
 
     private void writeJson(JsonObject jsonObject, String path) throws IOException {
-        FileWriter fileWriter = new FileWriter(path);
+        FileWriter fileWriter = new FileWriter(path, true);
+        fileWriter.write("\n");
         fileWriter.write(jsonObject.toString());
         fileWriter.write("]");
         fileWriter.close();
@@ -176,6 +188,7 @@ public class FileRepository extends FileServiceSpecification {
         for(Map.Entry<String, Object> property : entity.getPropertyMap().entrySet()) {
             if (property.getValue() instanceof Entity) {
                 object.add(property.getKey(), getJsonObject((Entity) property.getValue()));
+                continue;
             }
 
             object.addProperty(property.getKey(), property.getValue().toString());

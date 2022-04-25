@@ -5,11 +5,10 @@ import java.util.*;
 import model.Entity;
 import repository.FileRepository;
 import spec.DataHandlerSpecification;
-import spec.FileServiceSpecification;
 
 public class DataHandlerJsonImplementation extends DataHandlerSpecification {
 
-	private EntityService entityService;
+	private final EntityService entityService;
 
 	public DataHandlerJsonImplementation() {
 		fileService = new FileRepository();
@@ -23,11 +22,14 @@ public class DataHandlerJsonImplementation extends DataHandlerSpecification {
 		if (!entityService.setId(id, entity)) return false;
 
 		if (name != null) entity.setProperty("name", name);
-		if (propertyMap != null) entity.setPropertyMap(propertyMap);
+		if (propertyMap != null) entity.getPropertyMap().putAll(propertyMap);
 		if (nestedName != null) {
 			Entity nestedEntity = new Entity();
+			if (nestedPropertyMap.containsKey("id")) {
+				if (!entityService.setId(Integer.parseInt((String) nestedPropertyMap.get("id")), entity.getId(), nestedEntity)) return false;
+			} else entityService.setId(null, entity.getId(), nestedEntity);
 			nestedEntity.setPropertyMap(nestedPropertyMap);
-			entity.setProperty(name, nestedEntity);
+			entity.setProperty(nestedName, nestedEntity);
 		}
 
 		fileService.write(entity);
@@ -114,8 +116,11 @@ public class DataHandlerJsonImplementation extends DataHandlerSpecification {
 		List<Entity> copyOfEntities = new ArrayList<>(entities);
 
 		entities.iterator().forEachRemaining(entity -> {
-			if (entityService.checkPropertyCriteria(exactProperties, sameStartProperties, entity))
+			if (!entityService.checkPropertyCriteria(exactProperties, sameStartProperties, entity))
 				copyOfEntities.remove(entity);
+
+			if (nestedEntityName.equals(""))
+				return;
 
 			if (!entity.getPropertyMap().containsKey(nestedEntityName)) {
 				copyOfEntities.remove(entity);
@@ -123,7 +128,7 @@ public class DataHandlerJsonImplementation extends DataHandlerSpecification {
 			}
 
 			Entity nestedEntity = (Entity) entity.getPropertyMap().get(nestedEntityName);
-			if (entityService.checkPropertyCriteria(exactNestedProperties, sameStartNestedProperties, nestedEntity))
+			if (!entityService.checkPropertyCriteria(exactNestedProperties, sameStartNestedProperties, nestedEntity))
 				copyOfEntities.remove(entity);
 		});
 		
@@ -153,14 +158,17 @@ public class DataHandlerJsonImplementation extends DataHandlerSpecification {
 	public int delete(Map<String, Object> propertyMap) {
 		int counter = 0;
 		List<Entity> entities = fileService.read();
+		List<Entity> copyOfEntities = new ArrayList<>(entities);
 
-		entities.iterator().forEachRemaining(entity -> {
-			if (entityService.arePropertiesEqual(propertyMap, entity.getPropertyMap()))
-				entities.remove(entity);
-		});
+		for (Entity entity : entities) {
+			if (entityService.arePropertiesEqual(propertyMap, entity.getPropertyMap(), entity.getId())) {
+				copyOfEntities.remove(entity);
+				counter++;
+			}
+		}
 
 		fileService.clearFiles();
-		fileService.write(entities);
+		fileService.write(copyOfEntities);
 
 		return counter;
 	}

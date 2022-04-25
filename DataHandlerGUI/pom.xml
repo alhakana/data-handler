@@ -15,12 +15,6 @@
 
         <dependency>
             <groupId>com.datahandler</groupId>
-            <artifactId>data-handler-yaml-implementation</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.datahandler</groupId>
             <artifactId>data-handler-json-implementation</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

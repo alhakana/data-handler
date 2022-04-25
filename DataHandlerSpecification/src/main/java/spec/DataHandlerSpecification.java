@@ -3,6 +3,7 @@ package spec;
 import java.util.List;
 import java.util.Map;
 import model.Entity;
+import service.FileServiceSpecification;
 
 /**
  * Class which contains abstract methods.

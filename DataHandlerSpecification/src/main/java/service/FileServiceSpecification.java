@@ -1,4 +1,4 @@
-package spec;
+package service;
 
 import model.Entity;
 
@@ -10,7 +10,7 @@ public abstract class FileServiceSpecification {
 
     /**
      * Method which reads entities from the directory.
-     * @return list of read entites.
+     * @return list of read entites
      */
     public abstract List<Entity> read();
 
@@ -25,6 +25,5 @@ public abstract class FileServiceSpecification {
     public abstract void clearFiles();
 
     public abstract void clearFile(String path);
-
 
 }

@@ -12,8 +12,7 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		try {
 			Class.forName("app.JsonRegister");
-//			Class.forName("pack.YamlImpl");
-//			Class.forName("pack.CustomImpl");
+//			Class.forName("app.YamlRegister");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}  

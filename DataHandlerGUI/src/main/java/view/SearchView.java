@@ -79,6 +79,7 @@ public class SearchView extends GridPane {
 			sameStartMap = new HashMap<>();
 			exactNestedMap = new HashMap<>();
 			sameStartNestedMap = new HashMap<>();
+			nestedEntityName = "";
 
 			if ((!tfExactNestedProperties.getText().trim().equals("") || !tfSameStartNestedProperties.getText().trim().equals("")) &&
 					tfNestedEntityName.getText().trim().equals("")) {

@@ -58,7 +58,7 @@ public class MainView extends BorderPane {
 
     private void add() {
         HBox hb = new HBox();
-        hb.setSpacing(10);
+        hb.setSpacing(40);
         hb.getChildren().addAll(btnSearch, btnCreate, btnCreateNested, btnSort, btnDelete, btnDeleteQuery);
         hb.setPadding(new Insets(40, 20, 20, 20));
         setAlignment(hb, Pos.CENTER);
@@ -72,8 +72,8 @@ public class MainView extends BorderPane {
     private void makeTable() {
         TableColumn<Entity, Integer> colID = new TableColumn<>("id");
         TableColumn<Entity, String> colName = new TableColumn<>("name");
-        TableColumn<Entity, Map<String, String>> colProperties = new TableColumn<>("properties");
-        TableColumn<Entity, Map<String, Entity>> colEntities = new TableColumn<>("entities");
+        TableColumn<Entity, String> colProperties = new TableColumn<>("properties");
+        TableColumn<Entity, String> colEntities = new TableColumn<>("entities");
 
         colID.setMinWidth(100);
         colName.setMinWidth(100);
@@ -93,14 +93,14 @@ public class MainView extends BorderPane {
         btnSearch.setOnAction(e -> {
             if (Main.stage2 != null)
                 Main.stage2.close();
-            Scene scene = new Scene(new SearchView(dataHandlerSpecification, tblEntities), 550, 400);
+            Scene scene = new Scene(new SearchView(dataHandlerSpecification, tblEntities), 600, 400);
             makeNewStage(scene, "Search entities");
         });
 
         btnCreate.setOnAction(e -> {
             if (Main.stage2 != null)
                 Main.stage2.close();
-            Scene scene = new Scene(new NewEntityView(dataHandlerSpecification, tblEntities), 550, 400);
+            Scene scene = new Scene(new NewEntityView(dataHandlerSpecification, tblEntities), 600, 400);
             makeNewStage(scene, "Make new entity");
         });
 
@@ -112,12 +112,12 @@ public class MainView extends BorderPane {
 
             if (Main.stage2 != null)
                 Main.stage2.close();
-            Scene scene = new Scene(new NewNestedEntityView(dataHandlerSpecification, tblEntities), 450, 250);
+            Scene scene = new Scene(new NewNestedEntityView(dataHandlerSpecification, tblEntities), 600, 250);
             makeNewStage(scene, "Make new nested entity");
         });
 
         btnSort.setOnAction(e -> {
-            Scene scene = new Scene(new SortView(tblEntities), 450, 250);
+            Scene scene = new Scene(new SortView(tblEntities), 350, 200);
             makeNewStage(scene, "Sort entities");
         });
 
@@ -134,7 +134,7 @@ public class MainView extends BorderPane {
         });
 
         btnDeleteQuery.setOnAction(e -> {
-            Scene scene = new Scene(new DeleteView(dataHandlerSpecification, tblEntities), 450, 250);
+            Scene scene = new Scene(new DeleteView(dataHandlerSpecification, tblEntities), 650, 250);
             makeNewStage(scene, "Delete entities");
         });
 

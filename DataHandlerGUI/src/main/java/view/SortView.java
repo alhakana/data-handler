@@ -2,12 +2,10 @@ package view;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import model.Entity;
-import model.EntityIDOpadajuceComp;
-import model.EntityNameOpadajuceComp;
-import model.EntityNameRastuceComp;
+import model.*;
 
 import java.util.List;
 
@@ -52,7 +50,8 @@ public class SortView extends GridPane {
 		add(comboBox, 1, 0);
 		add(rBtnDescending, 0, 1);
 		add(rBtnAscending, 1, 1);
-		add(btnSort, 1, 2);
+		btnSort.setAlignment(Pos.CENTER);
+		add(btnSort, 2, 3);
 	}
 
 	private void setOnAction() {
@@ -61,11 +60,11 @@ public class SortView extends GridPane {
 
 			if (rBtnDescending.isSelected()) {
 				if (comboBox.getSelectionModel().getSelectedItem().equals("By name"))
-					entities.sort(new EntityNameOpadajuceComp());
-				else entities.sort(new EntityIDOpadajuceComp());
+					entities.sort(new EntityComparatorDescendingByName());
+				else entities.sort(new EntityComparatorDescendingById());
 			} else {
-				if (comboBox.getSelectionModel().getSelectedItem().equals("By id"))
-					entities.sort(new EntityNameRastuceComp());
+				if (comboBox.getSelectionModel().getSelectedItem().equals("By name"))
+					entities.sort(new EntityComparatorAscendingByName());
 				else entities.sort(null);
 			}
 

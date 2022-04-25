@@ -1,26 +1,18 @@
 package service;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import model.Entity;
 import repository.FileRepository;
 import spec.DataHandlerSpecification;
 import spec.StorageManager;
 
-/** @noinspection unchecked*/
 public class DataHandlerYamlImplementation extends DataHandlerSpecification {
 	
-	private EntityService entityService;
+	private final EntityService entityService;
 
 	public DataHandlerYamlImplementation() {
 		fileService = new FileRepository();
@@ -38,11 +30,14 @@ public class DataHandlerYamlImplementation extends DataHandlerSpecification {
 		if (!entityService.setId(id, entity)) return false;
 
 		if (name != null) entity.setProperty("name", name);
-		if (propertyMap != null) entity.setPropertyMap(propertyMap);
+		if (propertyMap != null) entity.getPropertyMap().putAll(propertyMap);
 		if (nestedName != null) {
 			Entity nestedEntity = new Entity();
+			if (nestedPropertyMap.containsKey("id")) {
+				if (!entityService.setId(Integer.parseInt((String) nestedPropertyMap.get("id")), entity.getId(), nestedEntity)) return false;
+			} else entityService.setId(null, entity.getId(), nestedEntity);
 			nestedEntity.setPropertyMap(nestedPropertyMap);
-			entity.setProperty(name, nestedEntity);
+			entity.setProperty(nestedName, nestedEntity);
 		}
 
 		fileService.write(entity);
@@ -125,22 +120,26 @@ public class DataHandlerYamlImplementation extends DataHandlerSpecification {
 	public List<Entity> search(Map<String, Object> exactProperties, Map<String, Object> sameStartProperties, String nestedEntityName,
 							   Map<String, Object> exactNestedProperties, Map<String, Object> sameStartNestedProperties) {
 		List<Entity> entities = fileService.read();
+		List<Entity> copyOfEntities = new ArrayList<>(entities);
 
 		entities.iterator().forEachRemaining(entity -> {
-			if (entityService.checkPropertyCriteria(exactProperties, sameStartProperties, entity))
-				entities.remove(entity);
+			if (!entityService.checkPropertyCriteria(exactProperties, sameStartProperties, entity))
+				copyOfEntities.remove(entity);
+
+			if (nestedEntityName.equals(""))
+				return;
 
 			if (!entity.getPropertyMap().containsKey(nestedEntityName)) {
-				entities.remove(entity);
+				copyOfEntities.remove(entity);
 				return;
 			}
 
 			Entity nestedEntity = (Entity) entity.getPropertyMap().get(nestedEntityName);
-			if (entityService.checkPropertyCriteria(exactNestedProperties, sameStartNestedProperties, nestedEntity))
-				entities.remove(entity);
+			if (!entityService.checkPropertyCriteria(exactNestedProperties, sameStartNestedProperties, nestedEntity))
+				copyOfEntities.remove(entity);
 		});
 
-		return entities;
+		return copyOfEntities;
 	}
 
 
@@ -169,14 +168,17 @@ public class DataHandlerYamlImplementation extends DataHandlerSpecification {
 	public int delete(Map<String, Object> propertyMap) {
 		int counter = 0;
 		List<Entity> entities = fileService.read();
+		List<Entity> copyOfEntities = new ArrayList<>(entities);
 
-		entities.iterator().forEachRemaining(entity -> {
-			if (entityService.arePropertiesEqual(propertyMap, entity.getPropertyMap()))
-				entities.remove(entity);
-		});
+		for (Entity entity : entities) {
+			if (entityService.arePropertiesEqual(propertyMap, entity.getPropertyMap(), entity.getId())) {
+				copyOfEntities.remove(entity);
+				counter++;
+			}
+		}
 
 		fileService.clearFiles();
-		fileService.write(entities);
+		fileService.write(copyOfEntities);
 
 		return counter;
 	}

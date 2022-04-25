@@ -38,15 +38,12 @@ public class SelectBaseView extends BorderPane {
 	
 	private void setActions() {
 		btnSelectBase.setOnAction(e -> {
-//			DirectoryChooser dc = new DirectoryChooser();
-//			File file = dc.showDialog(null);
-//
-//			if (file == null || !file.isDirectory()) return;
-//			else path = file.getAbsolutePath();
-			
-			path = "E:\\Alya\\RAF\\Asistent\\Arhiva\\SK\\Data Handler\\DataHandler examples\\Json";
-			System.out.println(path);
+			DirectoryChooser dc = new DirectoryChooser();
+			File file = dc.showDialog(null);
 
+			if (file == null || !file.isDirectory()) return;
+			else path = file.getAbsolutePath();
+			
 			dataHandlerSpecification = StorageManager.getExporter(path);
 			entities = dataHandlerSpecification.getFileService().read();
 

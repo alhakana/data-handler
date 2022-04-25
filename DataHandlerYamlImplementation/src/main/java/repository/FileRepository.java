@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import model.Entity;
 import service.DataHandlerYamlImplementation;
-import spec.FileServiceSpecification;
+import service.FileServiceSpecification;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -97,13 +97,14 @@ public class FileRepository extends FileServiceSpecification {
     private void formatEntity(Entity entity, FileWriter fileWriter, int level) throws IOException {
         if (level == 2) {
             fileWriter.append("- ");
-            appendSpaces(fileWriter, 1);
         } else appendSpaces(fileWriter, level);
 
         fileWriter.append("id: ").append(String.valueOf(entity.getId())).append("\n");
 
         if (entity.getPropertyMap() != null) {
             for (Map.Entry<String, Object> property : entity.getPropertyMap().entrySet()) {
+                if(property.getKey().equals("id"))
+                    continue;
                 appendSpaces(fileWriter, level);
 
                 if (property.getValue() instanceof Entity) {
@@ -162,7 +163,6 @@ public class FileRepository extends FileServiceSpecification {
         entities.iterator().forEachRemaining(this::write);
     }
 
-    @Override
     public void clearFiles() {
         File[] files = new File(DataHandlerYamlImplementation.directoryName).listFiles();
 
@@ -177,7 +177,7 @@ public class FileRepository extends FileServiceSpecification {
         }
     }
 
-    @Override
+
     public void clearFile(String path) {
         try {
             FileWriter fw = new FileWriter(path);
