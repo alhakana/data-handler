@@ -1,3 +1,5 @@
+# Data handler
+
 Multi-module Maven Java application with GUI for handling CRUD operations with JSON and YAML data formats. JSON parsing is done with gson library and YAML parsing is done with Jackson library. 
 
 Project is based on 4 modules:
